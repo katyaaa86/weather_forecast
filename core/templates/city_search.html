@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block content %}
+<div class="container mt-5">
+  <div class="d-flex justify-content-center">
+    <form method="POST" action="{% url 'search_city' %}" class="row p-3 row-cols-sm-auto g-1 border bg-light">
+      {% csrf_token %}
+      {% bootstrap_form form layout='inline' %}
+      {% bootstrap_button button_type="submit" content="OK" %}
+    </form>
+  </div>
+</div>
+<div class="container mt-5">
+  {% if weather_data %}
+    <h2 class="text-center mb-4">Прогноз погоды</h2>
+    <div class="d-flex justify-content-center">
+      <table class="table table-bordered table-sm w-auto">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">Дата</th>
+            <th scope="col">Температура, °C</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in weather_data %}
+            <tr>
+              <td>{{ row.date }}</td>
+              <td>{{ row.temperature_2m }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% elif error %}
+    <p style="color:red">{{ error }}</p>
+  {% endif %}
+  </div>
+{% endblock %}
