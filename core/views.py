@@ -20,10 +20,9 @@ class SearchCityView(generic.FormView):
             city = City(**coordinates)
             city.save()
 
-        if user_id:
-            user_city, _ = UserCity.objects.get_or_create(user_id=user_id, city=city)
-            user_city.count += 1
-            user_city.save()
+        user_city, _ = UserCity.objects.get_or_create(user_id=user_id, city=city)
+        user_city.count += 1
+        user_city.save()
 
         return city
 
@@ -50,7 +49,7 @@ class SearchCityView(generic.FormView):
         return initial
 
     def form_valid(self, form):
-        city_name = form.cleaned_data['city_name'].capitalize()
+        city_name = form.cleaned_data['city_name'].title()
         context = self.get_context_data(form=form)
         try:
             df = self._prepare_context_data(city_name, self.request.user.id)

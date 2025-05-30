@@ -12,5 +12,5 @@ class City(models.Model):
 
 class UserCity(models.Model):
     city = models.ForeignKey(City, on_delete=models.CASCADE, related_name='users')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cities')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cities', null=True)
     count = models.PositiveIntegerField(default=0)
