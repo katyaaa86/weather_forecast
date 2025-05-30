@@ -27,24 +27,26 @@
 ## Установка и запуск
 
 1. **Клонируйте репозиторий:**
-   ```bash
-   git clone https://github.com/katyaaa86/weather_forecast.git
-   ```
+```bash
+  git clone https://github.com/katyaaa86/weather_forecast.git
+```
 2. **Создайте виртуальное окружение:**
-    ```bash
-   python -m venv venv
-    source venv/bin/activate
-   ```
+ ```bash
+  python -m venv venv
+  source venv/bin/activate
+```
 и создайте файл .env с переменными виртуального окружения (за основу можно взять файл .env.example)
+
 3. **Установите зависимости:**
-    ```bash
+```bash
    pip install -r requirements.txt
-   ```
+```
+   
 4. **Выполните миграции и создайте суперпользователя:**
-    ```bash
-   python manage.py migrate
-    python manage.py createsuperuser
-   ```
+ ```bash
+  python manage.py migrate
+  python manage.py createsuperuser
+```
 5. **Запустите сервер разработки:**
     ```bash
    python manage.py runserver
