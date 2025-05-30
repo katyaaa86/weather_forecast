@@ -1,6 +1,8 @@
+from typing import Optional
 from urllib import parse
 
 from django.views import generic
+from pandas import DataFrame
 
 from core.forms import SearchCityForm
 from core.models import City, UserCity
@@ -11,7 +13,7 @@ class SearchCityView(generic.FormView):
     form_class = SearchCityForm
     template_name = 'city_search.html'
 
-    def _get_or_create_city(self, city_name, user_id):
+    def _get_or_create_city(self, city_name: str, user_id: Optional[int]) -> City:
         try:
             city = City.objects.get(name=city_name)
         except City.DoesNotExist:
@@ -26,7 +28,7 @@ class SearchCityView(generic.FormView):
 
         return city
 
-    def _prepare_context_data(self, city_name, user_id):
+    def _prepare_context_data(self, city_name: str, user_id: Optional[int]) -> DataFrame:
         city = self._get_or_create_city(city_name, user_id)
         api = WeatherAPI()
         response = api.fetch_current_weather(city.latitude, city.longitude)

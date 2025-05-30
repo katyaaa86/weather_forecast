@@ -1,7 +1,11 @@
+from typing import Optional
+
 import openmeteo_requests
 import pandas as pd
 import requests
 import requests_cache
+from openmeteo_sdk.WeatherApiResponse import WeatherApiResponse
+from pandas import DataFrame
 from retry_requests import retry
 
 class WeatherAPIError(Exception):
@@ -17,7 +21,7 @@ class WeatherAPI:
         retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
         self.openmeteo = openmeteo_requests.Client(session=retry_session)
 
-    def fetch_coordinates(self, city_name):
+    def fetch_coordinates(self, city_name: str) -> Optional[dict[str, str]]:
         params = {'name': city_name, 'count': 1, 'language': 'ru'}
 
         response = self._make_request(self.geo_url, params=params)
@@ -37,7 +41,7 @@ class WeatherAPI:
             'country': city_info['country'],
         }
 
-    def fetch_current_weather(self, latitude, longitude):
+    def fetch_current_weather(self, latitude: float, longitude: float) -> Optional[WeatherApiResponse]:
         params = {'latitude': latitude, 'longitude': longitude, 'hourly': 'temperature_2m'}
         try:
             response = self.openmeteo.weather_api(self.weather_url, params=params)
@@ -51,7 +55,13 @@ class WeatherAPI:
 
         return response[0]
 
-    def _make_request(self, url, method='GET', params=None, data=None):
+    def _make_request(
+            self,
+            url: str,
+            method: str = 'GET',
+            params: Optional[dict] = None,
+            data: Optional[dict]=None,
+    ) -> Optional[dict]:
         try:
             response = requests.request(method, url, params=params, data=data)
             response_data = response.json()
@@ -60,8 +70,8 @@ class WeatherAPI:
 
         return response_data
 
-    def generate_dataframe(self, response):
-        hourly = response.Hourly()
+    def generate_dataframe(self, weather_api_response: WeatherApiResponse) -> DataFrame:
+        hourly = weather_api_response.Hourly()
 
         hourly_temperature_2m = hourly.Variables(0).ValuesAsNumpy()
 
