@@ -1,3 +1,5 @@
+from urllib import parse
+
 from django.views import generic
 
 from core.forms import SearchCityForm
@@ -9,7 +11,7 @@ class SearchCityView(generic.FormView):
     form_class = SearchCityForm
     template_name = 'city_search.html'
 
-    def get_or_create_city(self, city_name, user_id):
+    def _get_or_create_city(self, city_name, user_id):
         try:
             city = City.objects.get(name=city_name)
         except City.DoesNotExist:
@@ -26,11 +28,26 @@ class SearchCityView(generic.FormView):
         return city
 
     def _prepare_context_data(self, city_name, user_id):
-        city = self.get_or_create_city(city_name, user_id)
+        city = self._get_or_create_city(city_name, user_id)
         api = WeatherAPI()
         response = api.fetch_current_weather(city.latitude, city.longitude)
         df = api.generate_dataframe(response)
         return df
+
+    def get(self, request, *args, **kwargs):
+        last_city = request.COOKIES.get('last_city')
+        form = self.get_form()
+        context = self.get_context_data(form=form)
+        if last_city:
+            context['last_city'] = parse.unquote(last_city)
+        return self.render_to_response(context)
+
+    def get_initial(self):
+        initial = super().get_initial()
+        last_city = self.request.COOKIES.get('last_city')
+        if last_city:
+            initial['city_name'] = parse.unquote(last_city)
+        return initial
 
     def form_valid(self, form):
         city_name = form.cleaned_data['city_name'].capitalize()
@@ -40,4 +57,6 @@ class SearchCityView(generic.FormView):
             context['weather_data'] = df.to_dict(orient='records')
         except WeatherAPIError as e:
             context['error'] = str(e)
-        return self.render_to_response(context)
+        response = self.render_to_response(context)
+        response.set_cookie('last_city', parse.quote(city_name))
+        return response
