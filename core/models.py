@@ -7,6 +7,10 @@ class City(models.Model):
     latitude = models.DecimalField(max_digits=7, decimal_places=5)
     longitude = models.DecimalField(max_digits=7, decimal_places=5)
 
+    def __str__(self):
+        return self.name
+
 class UserCity(models.Model):
     city = models.ForeignKey(City, on_delete=models.CASCADE, related_name='users')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cities')
+    count = models.PositiveIntegerField(default=0)

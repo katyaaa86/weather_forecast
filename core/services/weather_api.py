@@ -17,7 +17,7 @@ class WeatherAPI:
         retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
         self.openmeteo = openmeteo_requests.Client(session=retry_session)
 
-    def _fetch_coordinates(self, city_name):
+    def fetch_coordinates(self, city_name):
         params = {'name': city_name, 'count': 1, 'language': 'ru'}
 
         response = self._make_request(self.geo_url, params=params)
@@ -30,11 +30,15 @@ class WeatherAPI:
         if not results:
             raise WeatherAPIError('Ошибка получения координат')
         city_info = results[0]
-        return {'latitude': city_info['latitude'], 'longitude': city_info['longitude']}
+        return {
+            'latitude': city_info['latitude'],
+            'longitude': city_info['longitude'],
+            'name':city_info['name'],
+            'country': city_info['country'],
+        }
 
-    def fetch_current_weather(self, city_name):
-        params = self._fetch_coordinates(city_name)
-        params["hourly"] = "temperature_2m"
+    def fetch_current_weather(self, latitude, longitude):
+        params = {'latitude': latitude, 'longitude': longitude, 'hourly': 'temperature_2m'}
         try:
             response = self.openmeteo.weather_api(self.weather_url, params=params)
         except Exception as e:

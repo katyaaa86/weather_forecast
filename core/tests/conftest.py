@@ -38,7 +38,7 @@ def coordinates_response_data():
 
 @pytest.fixture
 def city_coordinates():
-    return {'latitude': 52.52437, 'longitude': 13.41053}
+    return {'latitude': 52.52437, 'longitude': 13.41053, "name": "Berlin", "country": "Deutschland"}
 
 @pytest.fixture
 def weather_response_data():
